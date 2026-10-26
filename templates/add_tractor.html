@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{% if listing %}Edit listing{% else %}Add a tractor{% endif %} | AgriRent{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+    <div class="mb-7">
+        <p class="text-sm font-bold uppercase tracking-wider text-green-700">Owner workspace</p>
+        <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-900">{% if listing %}Edit tractor listing{% else %}Add a tractor listing{% endif %}</h1>
+        <p class="mt-2 text-slate-500">Share your equipment, rental rates and services with local farmers.</p>
+    </div>
+    <form method="post" class="space-y-8 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <div>
+            <h2 class="text-lg font-extrabold text-slate-900">Equipment details</h2>
+            <div class="mt-5 grid gap-5 sm:grid-cols-2">
+                <div><label for="name" class="mb-1.5 block text-sm font-semibold text-slate-700">Listing name</label><input id="name" name="name" maxlength="200" required value="{{ listing.name if listing else '' }}" class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100"></div>
+                <div><label for="brand" class="mb-1.5 block text-sm font-semibold text-slate-700">Brand</label><input id="brand" name="brand" maxlength="200" required value="{{ listing.brand if listing else '' }}" class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100"></div>
+                <div><label for="model" class="mb-1.5 block text-sm font-semibold text-slate-700">Model</label><input id="model" name="model" maxlength="200" required value="{{ listing.model if listing else '' }}" class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100"></div>
+                <div><label for="location" class="mb-1.5 block text-sm font-semibold text-slate-700">Location / service area</label><input id="location" name="location" maxlength="200" required value="{{ listing.location if listing else '' }}" class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100"></div>
+                <div><label for="phone" class="mb-1.5 block text-sm font-semibold text-slate-700">Contact phone</label><input id="phone" type="tel" name="phone" maxlength="30" required value="{{ listing.phone if listing else '' }}" class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100"></div>
+                <div><label for="photo_url" class="mb-1.5 block text-sm font-semibold text-slate-700">Photo URL <span class="font-normal text-slate-400">(optional)</span></label><input id="photo_url" type="url" name="photo_url" value="{{ listing.photo_url if listing else '' }}" placeholder="https://" class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100"></div>
+            </div>
+        </div>
+        <div class="border-t border-slate-100 pt-7">
+            <h2 class="text-lg font-extrabold text-slate-900">Rates &amp; services</h2>
+            <p class="mt-1 text-sm text-slate-500">Enter zero for a pricing method you do not offer.</p>
+            <div class="mt-5 grid gap-5 sm:grid-cols-2">
+                <div><label for="hourly_rate" class="mb-1.5 block text-sm font-semibold text-slate-700">Hourly rent (₹)</label><input id="hourly_rate" type="number" name="hourly_rate" min="0" step="0.01" required value="{{ listing.hourly_rate if listing else '0' }}" class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100"></div>
+                <div><label for="acre_rate" class="mb-1.5 block text-sm font-semibold text-slate-700">Per-acre rent (₹)</label><input id="acre_rate" type="number" name="acre_rate" min="0" step="0.01" required value="{{ listing.acre_rate if listing else '0' }}" class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100"></div>
+                <div class="sm:col-span-2"><label for="services" class="mb-1.5 block text-sm font-semibold text-slate-700">Agricultural services</label><textarea id="services" name="services" rows="4" maxlength="2000" placeholder="Describe ploughing, sowing or other services offered." class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100">{{ listing.services if listing else '' }}</textarea></div>
+                <div class="sm:col-span-2"><label for="equipment" class="mb-1.5 block text-sm font-semibold text-slate-700">Available equipment &amp; charges</label><p class="mb-2 text-xs text-slate-500">One per line, charged once per booking. Example: Rotavator | 800</p><textarea id="equipment" name="equipment" rows="5" placeholder="Rotavator | 800&#10;Trailer | 500" class="w-full rounded-xl border border-slate-200 px-4 py-3 font-mono text-sm outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100">{{ equipment_text }}</textarea></div>
+            </div>
+        </div>
+        <div class="flex flex-wrap gap-3 border-t border-slate-100 pt-6">
+            <button type="submit" class="rounded-xl bg-green-600 px-6 py-3 font-bold text-white shadow-md shadow-green-600/20 transition hover:bg-green-700">Save listing</button>
+            {% if listing %}<a href="{{ url_for('tractor_details', listing_id=listing.id) }}" class="rounded-xl border border-slate-200 px-6 py-3 font-bold text-slate-700 hover:bg-slate-50">Cancel</a>{% endif %}
+        </div>
+    </form>
+</section>
+{% endblock %}

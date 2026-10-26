@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Customer history | AgriRent{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <p class="text-sm font-bold uppercase tracking-wider text-green-700">Owner workspace</p>
+    <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-900">Your customers</h1>
+    <p class="mt-2 text-slate-500">Private owner-specific history for customers who booked your equipment.</p>
+    {% if customers %}
+        <div class="mt-8 overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
+            <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+                <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th class="px-5 py-4 font-bold">Customer</th><th class="px-5 py-4 font-bold">Contact</th><th class="px-5 py-4 font-bold">Bookings</th><th class="px-5 py-4 font-bold">Completed</th><th class="px-5 py-4 font-bold">Last booking</th><th class="px-5 py-4 font-bold">History</th></tr></thead>
+                <tbody class="divide-y divide-slate-100">{% for customer in customers %}
+                    <tr class="hover:bg-slate-50"><td class="px-5 py-4"><p class="font-bold text-slate-900">{{ customer.name }}</p><p class="mt-1 text-xs text-slate-500">{{ customer.customer_code }}</p></td><td class="px-5 py-4"><p class="text-slate-700">{{ customer.phone }}</p><p class="mt-1 text-xs text-slate-500">{{ customer.email }}</p></td><td class="px-5 py-4 font-bold text-slate-800">{{ customer.total_bookings }}</td><td class="px-5 py-4 font-bold text-green-700">{{ customer.completed_jobs or 0 }}</td><td class="whitespace-nowrap px-5 py-4 text-slate-600">{{ customer.most_recent }}</td><td class="px-5 py-4"><a href="{{ url_for('customer_details', customer_id=customer.id) }}" class="whitespace-nowrap font-bold text-green-700 hover:text-green-900">View history →</a></td></tr>
+                {% endfor %}</tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="mt-8 rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center"><span class="text-4xl" aria-hidden="true">👋</span><h2 class="mt-4 text-xl font-bold text-slate-900">Your customer list starts here</h2><p class="mt-2 text-slate-500">Customer history will appear after your first booking.</p></div>
+    {% endif %}
+</section>
+{% endblock %}

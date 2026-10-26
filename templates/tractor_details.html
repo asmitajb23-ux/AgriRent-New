@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}{{ listing.name }} | AgriRent{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <p class="mb-5 text-sm font-medium text-slate-500"><a class="hover:text-green-700" href="{{ url_for('tractors') }}">Equipment</a> <span class="mx-2">/</span>{{ listing.name }}</p>
+    <div class="grid gap-8 lg:grid-cols-[1.35fr_0.65fr]">
+        <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+            {% if listing.photo_url %}
+                <img src="{{ listing.photo_url }}" alt="{{ listing.name }} tractor photo" class="h-72 w-full object-cover sm:h-[460px]">
+            {% else %}
+                <img src="https://images.unsplash.com/photo-1530267981375-f0de937f5f13?auto=format&amp;fit=crop&amp;w=1400&amp;q=85" alt="Tractor working in a farm field" class="h-72 w-full object-cover sm:h-[460px]">
+            {% endif %}
+            <div class="p-6 sm:p-8">
+                <div class="flex flex-wrap items-start justify-between gap-4">
+                    <div><p class="text-sm font-bold uppercase tracking-wider text-green-700">{{ listing.brand }} {{ listing.model }}</p>
+                        <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">{{ listing.name }}</h1>
+                        <p class="mt-3 text-slate-500">⌖ {{ listing.location }}</p></div>
+                    <span class="rounded-full bg-green-50 px-4 py-2 text-sm font-bold text-green-800">☆ Not rated yet</span>
+                </div>
+                <div class="mt-7 grid gap-3 sm:grid-cols-2">
+                    {% if listing.hourly_rate %}<div class="rounded-2xl bg-green-50 p-4"><p class="text-xs font-bold uppercase tracking-wide text-green-700">Hourly rental</p><p class="mt-1 text-2xl font-extrabold text-slate-900">₹{{ "%.2f"|format(listing.hourly_rate) }} <span class="text-sm font-semibold text-slate-500">/ hour</span></p></div>{% endif %}
+                    {% if listing.acre_rate %}<div class="rounded-2xl bg-slate-100 p-4"><p class="text-xs font-bold uppercase tracking-wide text-slate-500">Per-acre rental</p><p class="mt-1 text-2xl font-extrabold text-slate-900">₹{{ "%.2f"|format(listing.acre_rate) }} <span class="text-sm font-semibold text-slate-500">/ acre</span></p></div>{% endif %}
+                </div>
+                <div class="mt-8 grid gap-7 sm:grid-cols-2">
+                    <div>
+                        <h2 class="text-lg font-extrabold text-slate-900">Services offered</h2>
+                        <p class="mt-2 whitespace-pre-line leading-7 text-slate-600">{{ listing.services or "Contact the owner to discuss available services." }}</p>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-extrabold text-slate-900">Available equipment</h2>
+                        {% if equipment %}<ul class="mt-3 space-y-2">{% for item in equipment %}<li class="flex items-center justify-between gap-3 rounded-xl bg-slate-50 px-4 py-3 text-sm"><span class="font-semibold text-slate-700">{{ item.name }}</span><span class="font-bold text-slate-900">₹{{ "%.2f"|format(item.charge) }}</span></li>{% endfor %}</ul>
+                        {% else %}<p class="mt-2 text-sm text-slate-500">No separate equipment charges are listed.</p>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <aside class="space-y-5">
+            <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                <p class="text-sm font-bold uppercase tracking-wider text-green-700">Owner details</p>
+                <h2 class="mt-2 text-xl font-extrabold text-slate-900">{{ listing.owner_name }}</h2>
+                <p class="mt-3 text-sm leading-6 text-slate-600">Phone: <a class="font-semibold text-slate-900 hover:text-green-700" href="tel:{{ listing.phone }}">{{ listing.phone }}</a></p>
+                <p class="text-sm leading-6 text-slate-600">Email: <a class="break-all font-semibold text-slate-900 hover:text-green-700" href="mailto:{{ listing.owner_email }}">{{ listing.owner_email }}</a></p>
+                {% if current_user and current_user.role == 'customer' %}
+                    <a href="{{ url_for('create_booking', listing_id=listing.id) }}" class="mt-6 flex w-full items-center justify-center rounded-xl bg-green-600 px-5 py-3.5 font-bold text-white shadow-lg shadow-green-600/20 transition hover:bg-green-700">Request this tractor <span class="ml-2">→</span></a>
+                {% elif not current_user %}
+                    <a href="{{ url_for('login') }}" class="mt-6 flex w-full items-center justify-center rounded-xl bg-green-600 px-5 py-3.5 font-bold text-white transition hover:bg-green-700">Log in to request a booking</a>
+                {% endif %}
+                {% if current_user and current_user.role == 'owner' and current_user.id == listing.owner_id %}
+                    <div class="mt-6 flex flex-wrap gap-2 border-t border-slate-100 pt-5">
+                        <a class="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 hover:border-green-500 hover:text-green-700" href="{{ url_for('edit_tractor', listing_id=listing.id) }}">Edit listing</a>
+                        <a class="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 hover:border-green-500 hover:text-green-700" href="{{ url_for('manage_availability', listing_id=listing.id) }}">Availability</a>
+                        <form method="post" action="{{ url_for('delete_tractor', listing_id=listing.id) }}">
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="rounded-xl border border-red-200 px-4 py-2.5 text-sm font-bold text-red-700 hover:bg-red-50">Remove listing</button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 class="text-lg font-extrabold text-slate-900">Published availability</h2>
+                {% if availability %}<ul class="mt-4 space-y-3">{% for slot in availability %}<li class="flex items-center justify-between gap-3 rounded-xl bg-green-50 px-4 py-3 text-sm"><span class="font-bold text-slate-800">{{ slot.available_date }}</span><span class="text-green-800">{{ slot.start_time }}–{{ slot.end_time }}</span></li>{% endfor %}</ul>
+                {% else %}<p class="mt-2 text-sm leading-6 text-slate-500">The owner has not published future availability yet.</p>{% endif %}
+            </div>
+        </aside>
+    </div>
+</section>
+{% endblock %}

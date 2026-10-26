@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Farmer dashboard | AgriRent{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div class="flex flex-col justify-between gap-5 rounded-3xl bg-gradient-to-r from-green-800 to-green-600 p-7 text-white shadow-lg sm:flex-row sm:items-center sm:p-9">
+        <div><p class="text-sm font-bold uppercase tracking-wider text-green-100">Farmer dashboard</p><h1 class="mt-2 text-3xl font-extrabold">Welcome back, {{ current_user.name }}</h1><p class="mt-2 text-green-100">Your farm work and bookings, all in one place.</p></div>
+        <a href="{{ url_for('tractors') }}" class="shrink-0 rounded-xl bg-white px-5 py-3 font-bold text-green-800 transition hover:bg-green-50">Find equipment <span class="ml-1">→</span></a>
+    </div>
+    <div class="mt-6 grid gap-4 sm:grid-cols-2">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-sm font-semibold text-slate-500">Your bookings</p><p class="mt-2 text-3xl font-extrabold text-slate-900">{{ summary.total or 0 }}</p></div>
+        <div class="rounded-2xl border border-green-200 bg-green-50 p-5 shadow-sm"><p class="text-sm font-semibold text-green-800">Completed jobs</p><p class="mt-2 text-3xl font-extrabold text-green-950">{{ summary.completed or 0 }}</p></div>
+    </div>
+    <div class="mt-10">
+        <div class="mb-4 flex items-end justify-between"><div><h2 class="text-xl font-extrabold text-slate-900">Recent bookings</h2><p class="mt-1 text-sm text-slate-500">Check status and payment details for each request.</p></div><a href="{{ url_for('customer_history') }}" class="text-sm font-bold text-green-700 hover:text-green-800">View all →</a></div>
+        {% if bookings %}
+            <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+                    <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th class="px-5 py-4 font-bold">Booking</th><th class="px-5 py-4 font-bold">Date</th><th class="px-5 py-4 font-bold">Tractor</th><th class="px-5 py-4 font-bold">Owner</th><th class="px-5 py-4 font-bold">Status</th><th class="px-5 py-4 font-bold">Details</th></tr></thead>
+                    <tbody class="divide-y divide-slate-100">{% for booking in bookings %}
+                    <tr class="hover:bg-slate-50"><td class="whitespace-nowrap px-5 py-4 font-bold text-slate-900">#{{ booking.id }}</td><td class="whitespace-nowrap px-5 py-4 text-slate-600">{{ booking.work_date }}</td><td class="px-5 py-4"><span class="font-semibold text-slate-900">{{ booking.tractor_name }}</span><span class="block text-xs text-slate-500">{{ booking.location }}</span></td><td class="px-5 py-4 text-slate-600">{{ booking.owner_name }}</td><td class="px-5 py-4"><span class="whitespace-nowrap rounded-full bg-green-50 px-3 py-1.5 text-xs font-bold text-green-800">{{ booking.status.replace('_', ' ')|title }}</span></td><td class="px-5 py-4"><a class="whitespace-nowrap font-bold text-green-700 hover:text-green-900" href="{{ url_for('customer_booking', booking_id=booking.id) }}">View booking →</a></td></tr>
+                    {% endfor %}</tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center"><span class="text-4xl" aria-hidden="true">🌾</span><h3 class="mt-4 text-xl font-bold text-slate-900">Ready to get started?</h3><p class="mt-2 text-slate-500">Browse local listings and request equipment for your next job.</p><a href="{{ url_for('tractors') }}" class="mt-5 inline-flex rounded-xl bg-green-600 px-5 py-3 font-bold text-white hover:bg-green-700">Browse equipment</a></div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

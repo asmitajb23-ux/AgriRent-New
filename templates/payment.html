@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Payment | AgriRent{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
+    <a href="{{ url_for('customer_booking', booking_id=booking.id) }}" class="text-sm font-semibold text-green-700 hover:text-green-800">← Back to booking #{{ booking.id }}</a>
+    <div class="mt-5 grid gap-7 lg:grid-cols-[0.9fr_1.1fr]">
+        <div class="h-fit rounded-3xl bg-slate-900 p-7 text-white shadow-xl">
+            <p class="text-sm font-bold uppercase tracking-wider text-green-300">Payment summary</p>
+            <h1 class="mt-2 text-2xl font-extrabold">Booking #{{ booking.id }}</h1>
+            <div class="mt-6 space-y-4">
+                <div class="flex justify-between gap-3 border-b border-white/10 pb-3 text-sm"><span class="text-slate-300">Booking total</span><span class="font-bold">{{ booking.total_cents|rupees }}</span></div>
+                <div class="flex justify-between gap-3 border-b border-white/10 pb-3 text-sm"><span class="text-slate-300">Verified payments</span><span class="font-bold">{{ paid_cents|rupees }}</span></div>
+                <div class="flex justify-between gap-3 border-b border-white/10 pb-3 text-sm"><span class="text-slate-300">Remaining balance</span><span class="font-bold">{{ balance_cents|rupees }}</span></div>
+                <div class="flex justify-between gap-3 text-lg"><span class="font-bold text-green-200">Due now</span><span class="font-extrabold text-green-200">{{ payable_cents|rupees }}</span></div>
+            </div>
+            {% if booking.payment_plan != 'after_work' %}<p class="mt-5 rounded-xl bg-white/10 p-4 text-sm leading-6 text-slate-200">Advance required to confirm: <strong class="text-white">{{ required_cents|rupees }}</strong><br>Pending owner review: <strong class="text-white">{{ pending_cents|rupees }}</strong></p>{% endif %}
+        </div>
+        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <p class="text-sm font-bold uppercase tracking-wider text-green-700">Submit payment</p>
+            <h2 class="mt-2 text-2xl font-extrabold text-slate-900">Payment details</h2>
+            <div class="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
+                Cash and UPI submissions remain pending until the owner confirms receipt. Demo online is simulated only and is not a real payment. Never enter a card number or UPI PIN.
+            </div>
+            <form method="post" class="mt-6 space-y-5">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <div><label for="amount" class="mb-1.5 block text-sm font-semibold text-slate-700">Amount in rupees</label><input id="amount" type="number" name="amount" min="0.01" max="{{ "%.2f"|format(payable_cents / 100) }}" step="0.01" required class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100"><p class="mt-1 text-xs text-slate-500">Maximum currently due: ₹{{ "%.2f"|format(payable_cents / 100) }}</p></div>
+                <div><label for="method" class="mb-1.5 block text-sm font-semibold text-slate-700">Payment method</label><select id="method" name="method" required class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100"><option value="cash">Cash (owner must verify)</option><option value="upi">UPI (owner must verify; do not enter PIN)</option><option value="demo_online">Demo online (not a real charge)</option></select></div>
+                <div><label for="transaction_ref" class="mb-1.5 block text-sm font-semibold text-slate-700">Transaction / receipt reference <span class="font-normal text-slate-400">(optional)</span></label><input id="transaction_ref" name="transaction_ref" maxlength="120" class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100"></div>
+                <button type="submit" class="w-full rounded-xl bg-green-600 px-5 py-3.5 font-bold text-white shadow-md shadow-green-600/20 transition hover:bg-green-700">Submit for verification</button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Register | AgriRent{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+    <div class="grid overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-900/5 md:grid-cols-2">
+        <div class="relative hidden min-h-[620px] overflow-hidden bg-slate-900 md:block">
+            <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&amp;fit=crop&amp;w=1000&amp;q=85" alt="Green agricultural fields" class="absolute inset-0 h-full w-full object-cover opacity-60">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-green-950/30 to-transparent"></div>
+            <div class="absolute bottom-0 p-10 text-white">
+                <span class="rounded-full bg-white/15 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-green-100">Welcome to AgriRent</span>
+                <h2 class="mt-5 text-4xl font-extrabold leading-tight">Good work starts with the right equipment.</h2>
+                <p class="mt-4 leading-7 text-slate-200">Join local farmers and equipment owners making every season count.</p>
+            </div>
+        </div>
+        <div class="p-6 sm:p-10 lg:p-12">
+            <p class="text-sm font-bold uppercase tracking-wider text-green-700">Create an account</p>
+            <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-900">Join the community</h1>
+            <p class="mt-2 text-sm text-slate-500">Choose the account type that fits you best.</p>
+            <form method="post" class="mt-7 space-y-4">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <div><label for="name" class="mb-1.5 block text-sm font-semibold text-slate-700">Full name</label><input id="name" name="name" maxlength="100" required autocomplete="name" class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100"></div>
+                <div><label for="email" class="mb-1.5 block text-sm font-semibold text-slate-700">Email address</label><input id="email" type="email" name="email" maxlength="254" required autocomplete="email" class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100"></div>
+                <div><label for="phone" class="mb-1.5 block text-sm font-semibold text-slate-700">Phone number</label><input id="phone" type="tel" name="phone" maxlength="30" required autocomplete="tel" class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100"></div>
+                <div><label for="password" class="mb-1.5 block text-sm font-semibold text-slate-700">Password</label><input id="password" type="password" name="password" minlength="8" required autocomplete="new-password" class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100"><p class="mt-1 text-xs text-slate-500">Use at least 8 characters.</p></div>
+                <div><label for="role" class="mb-1.5 block text-sm font-semibold text-slate-700">I am registering as</label>
+                    <select id="role" name="role" required class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100">
+                        <option value="">Choose a role</option><option value="owner">Tractor owner</option><option value="customer">Customer / farmer</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full rounded-xl bg-green-600 px-5 py-3.5 font-bold text-white shadow-lg shadow-green-600/20 transition hover:bg-green-700">Create account</button>
+            </form>
+            <p class="mt-6 text-center text-sm text-slate-500">Already registered? <a class="font-bold text-green-700 hover:text-green-800" href="{{ url_for('login') }}">Log in</a></p>
+        </div>
+    </div>
+</section>
+{% endblock %}

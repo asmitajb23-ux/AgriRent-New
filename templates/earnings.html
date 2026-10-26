@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Earnings | AgriRent{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <p class="text-sm font-bold uppercase tracking-wider text-green-700">Owner workspace</p>
+    <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-900">Earnings &amp; balances</h1>
+    <p class="mt-2 text-slate-500">Only owner-verified payments count as received. Pending submissions are not included.</p>
+    {% if bookings %}
+        <div class="mt-8 overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm"><table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+            <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th class="px-4 py-4 font-bold">Booking</th><th class="px-4 py-4 font-bold">Work date</th><th class="px-4 py-4 font-bold">Tractor / customer</th><th class="px-4 py-4 font-bold">Status</th><th class="px-4 py-4 font-bold">Agreed total</th><th class="px-4 py-4 font-bold">Verified received</th><th class="px-4 py-4 font-bold">Balance</th></tr></thead>
+            <tbody class="divide-y divide-slate-100">{% for booking in bookings %}
+            <tr class="hover:bg-slate-50"><td class="px-4 py-4"><a class="font-bold text-green-700 hover:text-green-900" href="{{ url_for('owner_booking', booking_id=booking.id) }}">#{{ booking.id }}</a></td><td class="whitespace-nowrap px-4 py-4 text-slate-600">{{ booking.work_date }}</td><td class="px-4 py-4"><p class="font-semibold text-slate-800">{{ booking.tractor_name }}</p><p class="text-xs text-slate-500">{{ booking.customer_name }}</p></td><td class="px-4 py-4"><span class="whitespace-nowrap rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">{{ booking.status.replace('_', ' ')|title }}</span></td><td class="whitespace-nowrap px-4 py-4 font-bold text-slate-900">{{ booking.total_cents|rupees }}</td><td class="whitespace-nowrap px-4 py-4 font-bold text-green-700">{{ booking.paid_cents|rupees }}</td><td class="whitespace-nowrap px-4 py-4 font-bold text-slate-900">{{ [booking.total_cents - booking.paid_cents, 0]|max|rupees }}</td></tr>
+            {% endfor %}</tbody>
+        </table></div>
+    {% else %}
+        <div class="mt-8 rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center"><h2 class="text-xl font-bold text-slate-900">Earnings will appear here</h2><p class="mt-2 text-sm text-slate-500">Once customers book your equipment, agreed totals and verified payments are listed here.</p></div>
+    {% endif %}
+</section>
+{% endblock %}

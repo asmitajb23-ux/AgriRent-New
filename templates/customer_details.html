@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Customer details | AgriRent{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <a href="{{ url_for('customer_history_list') }}" class="text-sm font-semibold text-green-700 hover:text-green-800">← Back to customers</a>
+    <div class="mt-5 flex flex-wrap items-start justify-between gap-4">
+        <div><p class="text-sm font-bold uppercase tracking-wider text-green-700">Customer profile</p><h1 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-900">{{ customer.name }}</h1><p class="mt-2 text-slate-500">{{ customer.customer_code }} · {{ customer.phone }} · {{ customer.email }}</p></div>
+        <span class="rounded-full bg-green-50 px-4 py-2 text-sm font-bold text-green-800">{{ customer_status }}</span>
+    </div>
+    <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-sm font-semibold text-slate-500">Bookings</p><p class="mt-2 text-2xl font-extrabold text-slate-900">{{ customer.total_bookings }}</p></article>
+        <article class="rounded-2xl border border-green-200 bg-green-50 p-5 shadow-sm"><p class="text-sm font-semibold text-green-800">Completed jobs</p><p class="mt-2 text-2xl font-extrabold text-green-950">{{ customer.completed_jobs or 0 }}</p></article>
+        <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-sm font-semibold text-slate-500">Completed acres</p><p class="mt-2 text-2xl font-extrabold text-slate-900">{{ "%.2f"|format(customer.completed_acres or 0) }}</p></article>
+        <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-sm font-semibold text-slate-500">Completed charges</p><p class="mt-2 text-2xl font-extrabold text-slate-900">{{ (customer.completed_charges or 0)|rupees }}</p></article>
+        <article class="rounded-2xl border border-green-200 bg-green-50 p-5 shadow-sm"><p class="text-sm font-semibold text-green-800">Verified payments</p><p class="mt-2 text-2xl font-extrabold text-green-950">{{ verified_cents|rupees }}</p></article>
+        <article class="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm"><p class="text-sm font-semibold text-amber-800">Outstanding balance</p><p class="mt-2 text-2xl font-extrabold text-amber-950">{{ outstanding_cents|rupees }}</p></article>
+    </div>
+    <div class="mt-4 rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-600 shadow-sm"><span class="font-bold text-slate-900">Customer timeline:</span> First booking {{ customer.first_booking }} <span class="mx-2 text-slate-300">·</span> Most recent {{ customer.most_recent }}</div>
+
+    <section class="mt-10">
+        <div class="mb-4"><h2 class="text-xl font-extrabold text-slate-900">Booking history</h2><p class="mt-1 text-sm text-slate-500">Services, equipment and work completed with your tractors.</p></div>
+        {% if bookings %}
+        <div class="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm"><table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+            <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th class="px-4 py-4 font-bold">Booking</th><th class="px-4 py-4 font-bold">Date</th><th class="px-4 py-4 font-bold">Tractor</th><th class="px-4 py-4 font-bold">Work</th><th class="px-4 py-4 font-bold">Equipment</th><th class="px-4 py-4 font-bold">Status</th><th class="px-4 py-4 font-bold">Charges</th></tr></thead>
+            <tbody class="divide-y divide-slate-100">{% for booking in bookings %}
+            <tr class="hover:bg-slate-50"><td class="px-4 py-4"><a class="font-bold text-green-700 hover:text-green-900" href="{{ url_for('owner_booking', booking_id=booking.id) }}">#{{ booking.id }}</a></td><td class="whitespace-nowrap px-4 py-4 text-slate-600">{{ booking.work_date }}</td><td class="px-4 py-4 font-semibold text-slate-800">{{ booking.tractor_name }}</td><td class="px-4 py-4 text-slate-600">{{ booking.service or "—" }}<span class="block text-xs">{{ booking.acres }} acres</span></td><td class="px-4 py-4 text-slate-600">{% for item in booking.equipment %}{{ item.equipment_name }}{% if not loop.last %}, {% endif %}{% else %}—{% endfor %}</td><td class="px-4 py-4"><span class="whitespace-nowrap rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-800">{{ booking.status.replace('_', ' ')|title }}</span></td><td class="whitespace-nowrap px-4 py-4 font-bold text-slate-900">{{ booking.total_cents|rupees }}</td></tr>
+            {% endfor %}</tbody>
+        </table></div>
+        {% else %}<p class="rounded-2xl bg-white p-6 text-sm text-slate-500 shadow-sm">No bookings found for this owner.</p>{% endif %}
+    </section>
+    <section class="mt-10">
+        <div class="mb-4"><h2 class="text-xl font-extrabold text-slate-900">Payment history</h2><p class="mt-1 text-sm text-slate-500">Payments associated with this customer's bookings.</p></div>
+        {% if payments %}
+        <div class="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm"><table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+            <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th class="px-4 py-4 font-bold">Payment</th><th class="px-4 py-4 font-bold">Booking</th><th class="px-4 py-4 font-bold">Date</th><th class="px-4 py-4 font-bold">Amount</th><th class="px-4 py-4 font-bold">Method</th><th class="px-4 py-4 font-bold">Reference</th><th class="px-4 py-4 font-bold">Status</th></tr></thead>
+            <tbody class="divide-y divide-slate-100">{% for payment in payments %}<tr><td class="px-4 py-4 font-bold text-slate-800">#{{ payment.id }}</td><td class="px-4 py-4 text-slate-600">#{{ payment.booking_number }}</td><td class="whitespace-nowrap px-4 py-4 text-slate-600">{{ payment.created_at }}</td><td class="whitespace-nowrap px-4 py-4 font-bold text-slate-900">{{ payment.amount_cents|rupees }}</td><td class="px-4 py-4 text-slate-600">{{ payment.method.replace('_', ' ')|title }}</td><td class="px-4 py-4 text-slate-500">{{ payment.transaction_ref or "—" }}</td><td class="px-4 py-4"><span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">{{ payment.status|title }}</span></td></tr>{% endfor %}</tbody>
+        </table></div>
+        {% else %}<p class="rounded-2xl bg-white p-6 text-sm text-slate-500 shadow-sm">No payment records.</p>{% endif %}
+    </section>
+</section>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Payment records | AgriRent{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <p class="text-sm font-bold uppercase tracking-wider text-green-700">Account records</p>
+    <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-900">Payment history</h1>
+    <p class="mt-2 text-slate-500">{% if owner_view %}Payment submissions across bookings for your equipment.{% else %}Your submitted payment records and verification status.{% endif %}</p>
+    {% if payments %}
+        <div class="mt-8 overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm"><table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+            <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th class="px-4 py-4 font-bold">Payment</th><th class="px-4 py-4 font-bold">Booking</th><th class="px-4 py-4 font-bold">Date</th>{% if owner_view %}<th class="px-4 py-4 font-bold">Customer</th>{% else %}<th class="px-4 py-4 font-bold">Owner</th>{% endif %}<th class="px-4 py-4 font-bold">Tractor</th><th class="px-4 py-4 font-bold">Amount</th><th class="px-4 py-4 font-bold">Method</th><th class="px-4 py-4 font-bold">Reference</th><th class="px-4 py-4 font-bold">Status</th></tr></thead>
+            <tbody class="divide-y divide-slate-100">{% for payment in payments %}
+            <tr class="hover:bg-slate-50"><td class="px-4 py-4 font-bold text-slate-800">#{{ payment.id }}</td><td class="px-4 py-4"><a class="font-bold text-green-700 hover:text-green-900" href="{% if owner_view %}{{ url_for('owner_booking', booking_id=payment.booking_number) }}{% else %}{{ url_for('customer_booking', booking_id=payment.booking_number) }}{% endif %}">#{{ payment.booking_number }}</a></td><td class="whitespace-nowrap px-4 py-4 text-slate-600">{{ payment.created_at }}</td><td class="px-4 py-4 text-slate-700">{% if owner_view %}{{ payment.customer_name }}{% else %}{{ payment.owner_name }}{% endif %}</td><td class="px-4 py-4 text-slate-700">{{ payment.tractor_name }}</td><td class="whitespace-nowrap px-4 py-4 font-bold text-slate-900">{{ payment.amount_cents|rupees }}</td><td class="px-4 py-4 text-slate-600">{{ payment.method.replace('_', ' ')|title }}</td><td class="px-4 py-4 text-slate-500">{{ payment.transaction_ref or "—" }}</td><td class="px-4 py-4"><span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">{{ payment.status|title }}</span></td></tr>
+            {% endfor %}</tbody>
+        </table></div>
+    {% else %}
+        <div class="mt-8 rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center"><h2 class="text-xl font-bold text-slate-900">No payment records yet</h2><p class="mt-2 text-sm text-slate-500">Payment submissions will show up here.</p></div>
+    {% endif %}
+</section>
+{% endblock %}

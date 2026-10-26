@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f0fdf4">
+    <title>{% block title %}AgriRent{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-50 font-['Inter',sans-serif] text-slate-800 antialiased">
+    <header class="sticky top-0 z-30 border-b border-slate-200/80 bg-white/95 shadow-sm backdrop-blur">
+        <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+            <a href="{{ url_for('index') }}" class="flex shrink-0 items-center gap-3" aria-label="AgriRent home">
+                <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-green-600 text-2xl text-white shadow-lg shadow-green-600/20">🌱</span>
+                <span>
+                    <span class="block text-xl font-extrabold tracking-tight text-slate-900">Agri<span class="text-green-600">Rent</span></span>
+                    <span class="hidden text-xs font-medium text-slate-500 sm:block">Farm work, made easier</span>
+                </span>
+            </a>
+
+            <form action="{{ url_for('tractors') }}" method="get" class="order-3 flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-1.5 sm:order-none sm:ml-5 sm:max-w-xs">
+                <label for="nav-search" class="sr-only">Search tractors and equipment</label>
+                <input id="nav-search" name="q" value="{{ request.args.get('q', '') }}" placeholder="Search tractors..." class="min-w-0 flex-1 border-0 bg-transparent px-3 py-2 text-sm outline-none placeholder:text-slate-400 focus:ring-0">
+                <button type="submit" aria-label="Search" class="rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-700">Search</button>
+            </form>
+
+            <nav aria-label="Main navigation" class="flex w-full flex-wrap items-center gap-x-5 gap-y-3 text-sm font-semibold text-slate-600 sm:w-auto">
+                <a class="transition hover:text-green-700" href="{{ url_for('index') }}">Home</a>
+                <a class="transition hover:text-green-700" href="{{ url_for('tractors') }}">Browse equipment</a>
+                <a class="hidden transition hover:text-green-700 md:inline" href="{{ url_for('about') }}">About</a>
+                {% if current_user %}
+                    {% if current_user.role == 'owner' %}
+                        <a class="transition hover:text-green-700" href="{{ url_for('owner_dashboard') }}">Dashboard</a>
+                        <a class="hidden transition hover:text-green-700 lg:inline" href="{{ url_for('booking_requests') }}">Requests</a>
+                        <a class="hidden transition hover:text-green-700 lg:inline" href="{{ url_for('booking_history') }}">Bookings</a>
+                        <a class="hidden transition hover:text-green-700 xl:inline" href="{{ url_for('customer_history_list') }}">Customers</a>
+                        <a class="hidden transition hover:text-green-700 xl:inline" href="{{ url_for('payment_history') }}">Payments</a>
+                        <a class="hidden transition hover:text-green-700 xl:inline" href="{{ url_for('earnings') }}">Earnings</a>
+                    {% else %}
+                        <a class="transition hover:text-green-700" href="{{ url_for('customer_dashboard') }}">My dashboard</a>
+                        <a class="hidden transition hover:text-green-700 md:inline" href="{{ url_for('customer_history') }}">My bookings</a>
+                        <a class="hidden transition hover:text-green-700 lg:inline" href="{{ url_for('customer_payment_history') }}">My payments</a>
+                    {% endif %}
+                    <form method="post" action="{{ url_for('logout') }}">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-bold text-slate-700 transition hover:border-green-600 hover:text-green-700">Log out</button>
+                    </form>
+                {% else %}
+                    <a class="transition hover:text-green-700" href="{{ url_for('login') }}">Log in</a>
+                    <a class="rounded-xl bg-green-600 px-4 py-2.5 font-bold text-white shadow-md shadow-green-600/20 transition hover:bg-green-700" href="{{ url_for('register') }}">Get started</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="min-h-[70vh]">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <section aria-label="Notifications" class="mx-auto max-w-7xl px-4 pt-5 sm:px-6 lg:px-8">
+                    {% for category, message in messages %}
+                        <div role="status" class="mb-3 rounded-2xl border px-5 py-4 text-sm font-medium shadow-sm {% if category == 'error' %}border-red-200 bg-red-50 text-red-800{% else %}border-green-200 bg-green-50 text-green-800{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </section>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="mt-20 border-t border-slate-200 bg-white">
+        <div class="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-10 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
+            <div>
+                <a href="{{ url_for('index') }}" class="text-lg font-extrabold text-slate-900">Agri<span class="text-green-600">Rent</span></a>
+                <p class="mt-1 text-sm text-slate-500">Local equipment for the work your farm needs.</p>
+            </div>
+            <div class="flex flex-wrap gap-5 text-sm font-medium text-slate-500">
+                <a class="hover:text-green-700" href="{{ url_for('tractors') }}">Browse equipment</a>
+                <a class="hover:text-green-700" href="{{ url_for('about') }}">About</a>
+                <a class="hover:text-green-700" href="{{ url_for('contact') }}">Contact</a>
+            </div>
+            <p class="text-xs text-slate-400">Local demo. Confirm rental terms directly with the owner.</p>
+        </div>
+    </footer>
+</body>
+</html>
